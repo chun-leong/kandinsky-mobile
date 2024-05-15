@@ -1,0 +1,68 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title class="ion-text-wrap">
+      Information
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="p-4">
+  <ion-header collapse="condense">
+    <ion-toolbar color="translucent">
+      <ion-title class="ion-text-wrap" size="large">
+        Information
+      </ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-list lines="none">
+    <ion-item>
+      <ion-label position="stacked">Title</ion-label>
+      <ion-text class="small" color="medium" (click)="copyText(post.content)">{{ post.content }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Date Published</ion-label>
+      <ion-text class="small" color="medium" (click)="copyDatetime(post.publishTimestamp)">{{ post.publishTimestamp | amDateFormat:'D MMMM YYYY h:mm A' }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">First Comment</ion-label>
+      <ion-text class="small" color="medium" (click)="copyDatetime(post.metadata.commentsMetadata.firstTimestamp)">{{ post.metadata.commentsMetadata.firstTimestamp | amDateFormat:'D MMMM YYYY h:mm A' }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Last Comment</ion-label>
+      <ion-text class="small" color="medium" (click)="copyDatetime(post.metadata.commentsMetadata.lastTimestamp)">{{ post.metadata.commentsMetadata.lastTimestamp | amDateFormat:'D MMMM YYYY h:mm A' }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Total Comments</ion-label>
+      <ion-text class="small" color="medium" (click)="copyText(post.commentCount)">{{ post.commentCount }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Source</ion-label>
+      <ion-text class="small" color="medium" (click)="copyText(post.platform)">{{ post.platform }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Date Extracted</ion-label>
+      <ion-text class="small" color="medium" (click)="copyDatetime(post.metadata.createTimestamp)">{{ post.metadata.createTimestamp | amDateFormat:'D MMMM YYYY h:mm A' }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">URL</ion-label>
+      <ion-text class="small" color="medium" (click)="copyText(post.sourceUrl)">{{ post.sourceUrl }}</ion-text>
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+<ion-footer>
+  <ion-row>
+    <ion-col class="px-4">
+      <ion-button expand="block" color="warning" (click)="displayReloadDataAlert()">Reload Data</ion-button>
+    </ion-col>
+    <ion-col class="px-4">
+      <ion-button expand="block" color="danger" (click)="displayDeletePostAlert()">Delete Post</ion-button>
+    </ion-col>
+  </ion-row>
+</ion-footer>

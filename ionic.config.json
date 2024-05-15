@@ -1,0 +1,8 @@
+{
+  "name": "kandinsky-mobile",
+  "integrations": {
+    "cordova": {},
+    "capacitor": {}
+  },
+  "type": "angular"
+}

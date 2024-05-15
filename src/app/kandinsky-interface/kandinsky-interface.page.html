@@ -1,0 +1,228 @@
+<ion-content fullscreen [scrollY]="false">
+  <ksky-canvas #canvas
+    [selectedConcentricCircle]="selectedCircle"
+    (selectConcentricCircleEvent)="selectedConcentricCircleChange($event)"
+    [timestamp]="timestamp"
+    [isHighlightModeOn]="isSpectrumModeOn"
+    [isFocusModeOn]="isFocusModeOn"
+    (onReady)="onCanvasReady()">
+  </ksky-canvas>
+  <div class="interface-overlay">
+    <div class="interface-header">
+      <div class="header-container text-light pl-4 pr-2 pt-4 d-flex justify-content-between">
+        <ion-buttons slot="start">
+          <ion-back-button defaultHref="" style="font-size: small; --icon-margin-end: '-2px';"></ion-back-button>
+        </ion-buttons>
+        <div class="title-container pl-3 mr-auto" *ngIf="post" (click)="fullTitle = !fullTitle">
+          <p class="mb-1" *ngIf="!fullTitle">{{ post.content.length > 44 ? (post.content | slice : 0 : 44) + '...' : post.content }}</p>
+          <p class="mb-1" *ngIf="fullTitle">{{ post.content }}</p>
+          <p class="text-muted mb-0 font-weight-light">by {{post.authorName}}</p>
+        </div>
+        <ion-button
+          fill="clear"
+          color="medium"
+          class="ml-2 mt-0"
+          (click)="displayPostInformation()">
+          <ion-icon name="more" mode="md"></ion-icon>
+        </ion-button>
+      </div>
+      <div class="subheader-container px-4 py-2" *ngIf="!isShowSimilarCommentsOn">
+        <ion-searchbar
+          class="p-0"
+          [(ngModel)]="searchQuery"
+          (ionChange)="search(searchQuery)"
+          (ionFocus)="setIsSearchFocusOn(true)"
+          (ionBlur)="setIsSearchFocusOn(false)"
+          (ionClear)="search()">
+        </ion-searchbar>
+        <!-- <ksky-search #searchComponent
+          (searchQueryChange)="search($event)"
+          (setSearchFocusMode)="setIsSearchFocusOn($event)">
+        </ksky-search> -->
+      </div>
+      <div class="comments-container subheader-container px-0 py-2" *ngIf="isShowSimilarCommentsOn">
+        <ion-card class="p-2 my-1">
+          <ion-list-header>
+            <ion-label>Reference Comment</ion-label>
+            <ion-button fill="clear"
+              [color]="isReferenceCommentMinimized ? 'medium' : 'primary'"
+              size="small"
+              (click)="isReferenceCommentMinimized = !isReferenceCommentMinimized">
+              <ion-icon name="resize"></ion-icon>
+            </ion-button>
+          </ion-list-header>
+          <ion-card-content class="p-0">
+            <ion-list class="comments-list p-0" *ngIf="!isReferenceCommentMinimized">
+              <ng-container
+                [ngTemplateOutlet]="commentItem"
+                [ngTemplateOutletContext]="referenceCommentContext">
+              </ng-container>
+            </ion-list>
+            <p class="font-italic text-center py-2" *ngIf="isReferenceCommentMinimized">
+              <small>
+                {{ referenceCommentContext.context.comment.content }}
+              </small>
+            </p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+      <div class="panel-container pl-4">
+        <button
+          class="btn btn-medium"
+          (click)="toggleSpectrumMode()">
+          <ion-icon
+            [color]="isSpectrumModeOn ? 'primary' : 'medium'"
+            name="podium">
+          </ion-icon>
+        </button>
+      </div>
+    </div>
+    <div class="interface-content">
+
+      <div class="px-4 d-flex pointer-events-none">
+        <div class="timestamp-container flex-grow-1" *ngIf="!isSpectrumModeOn">
+          <h5 class="font-weight-light">
+            {{ ((timestamp === 0 && post) ? post.publishTimestamp : timestamp) | amDateFormat: 'D MMMM YYYY' }}
+          </h5>
+          <ion-text color="medium">
+            <p>{{ ((timestamp === 0 && post) ? post.publishTimestamp : timestamp) | amDateFormat: 'h:mm:ss A' }} </p>
+          </ion-text>
+        </div>
+        <div class="timestamp-container flex-grow-1" *ngIf="isSpectrumModeOn">
+          <h6 class="font-weight-light">
+            <span>
+              {{ spectrumStartTime | amDateFormat: 'h:mm A D MMMM YY' }}
+            </span>
+            <span class="text-muted">-</span>
+            <span>
+              {{ spectrumEndTime | amDateFormat: 'h:mm A D MMMM YY' }}
+            </span>
+          </h6>
+        </div>
+      </div>
+
+      <div class="comments-container" *ngIf="isShowSimilarCommentsOn">
+        <ion-card class="p-2 my-1">
+          <ion-list-header>
+            <ion-label>Similar Comments ({{ visibleSimilarCommentsCount }}/{{ similarCommentsContexts.length }})</ion-label>
+            <ion-button fill="clear" color="medium" size="small" (click)="selectedSimilarityReferenceCircleChange()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-list-header>
+          <ion-card-content class="p-0">
+            <ion-list class="comments-list p-0" #commentsList>
+              <ng-container *ngFor="let context of similarCommentsContexts"
+                [ngTemplateOutlet]="commentItem"
+                [ngTemplateOutletContext]="context">
+              </ng-container>
+              <p class="text-center p-4" *ngIf="visibleSimilarCommentsCount === 0">
+                <ion-text color="medium" *ngIf="isSpectrumModeOn">No similar comments displayed. Adjust the spectrum knobs to show more comments.</ion-text>
+                <ion-text color="medium" *ngIf="!isSpectrumModeOn">No similar comments displayed. Adjust the timeline cursor to show more comments.</ion-text>
+              </p>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <div class="comments-container" *ngIf="isShowCommentsOn && !isShowSimilarCommentsOn">
+        <ion-card class="p-2 my-1">
+          <ion-list-header>
+            <ion-label>Selected Comments ({{ visibleCommentsCount }}/{{ commentRepliesContexts.length + 1 }})</ion-label>
+            <!-- <ion-button fill="clear" color="medium" size="small" (click)="canvas.unselect()"> -->
+            <ion-button fill="clear" color="medium" size="small" (click)="canvas.select()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-list-header>
+          <ion-card-content class="p-0">
+            <ion-list class="comments-list p-0" #commentsList>
+              <ng-container
+                [ngTemplateOutlet]="commentItem"
+                [ngTemplateOutletContext]="commentContext">
+              </ng-container>
+              <ng-container *ngFor="let context of commentRepliesContexts"
+                [ngTemplateOutlet]="commentItem"
+                [ngTemplateOutletContext]="context">
+              </ng-container>
+              <p class="text-center p-4" *ngIf="visibleCommentsCount === 0">
+                <ion-text color="medium" *ngIf="isSpectrumModeOn">No comments displayed. Adjust the spectrum knobs to show more comments.</ion-text>
+                <ion-text color="medium" *ngIf="!isSpectrumModeOn">No comments displayed. Adjust the timeline cursor to show more comments.</ion-text>
+              </p>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <ksky-spectrum-controls #spectrumControls
+        *ngIf="isSpectrumModeOn"
+        [intervals]="spectrumIntervals"
+        [(range)]="spectrumRange"
+        (rangeChange)="spectrumRangeChange()">
+      </ksky-spectrum-controls>
+
+      <ksky-timeline-controls #timelineControls
+        *ngIf="!isSpectrumModeOn"
+        [(progress)]="progress"
+        (progressChange)="timestampChange($event)"
+        [MAX_PROGRESS]="maxProgress">
+      </ksky-timeline-controls>
+    </div>
+  </div>
+</ion-content>
+
+<ng-template #commentItem let-context="context">
+  <ion-item 
+    *ngIf="context.display.visible"
+    [id]="context.id"
+    [lines]="context.display.showLines ? 'inset' : 'none'"
+    class="comment-item">
+    <ion-label class="ion-text-wrap" [style.padding-left]="(MAX_LIKE_BAR_WIDTH + 12) + 'px'">
+      <div class="like-bar" [style.width]="context.bar.width" [style.background-color]="context.bar.color"></div>
+      <div class="d-flex justify-content-between mb-1">
+        <h3 class="d-inline">{{ context.comment.authorName }}</h3>
+        <small class="text-muted">{{ context.comment.publishTimestamp | amDateFormat : 'D MMM YYYY H:mm A' }}</small>
+      </div>
+      <!-- yellow: {{context.display.highlightOptions[0].indices.join(' - ')}}
+      blue: {{context.display.highlightOptions[1].indices.join(' - ')}} -->
+      <p [innerHTML]="context.comment.content | highlight : context.display.highlightOptions | sanitizeHtml"></p>
+      <div class="d-flex justify-content-between">
+        <div class="buttons-container">
+          <ion-button size="small" fill="clear" color="medium">
+            {{ context.comment.likeCount }}
+            <ion-icon slot="end" name="thumbs-up" mode="md"></ion-icon>
+          </ion-button>
+          <ion-button size="small" fill="clear" color="medium">
+            {{ context.replies.count }}
+            <ion-icon slot="end" name="chatboxes"></ion-icon>
+          </ion-button>
+          <ion-button size="small" fill="clear" color="medium" (click)="canvas.zoomTo(context.circle.concentricCircleId)">
+            <ion-icon slot="icon-only" name="search"></ion-icon>
+          </ion-button>
+        </div>
+        <div class="similarity-container">
+          <ion-button size="small" fill="clear" color="primary"
+            *ngIf="context.analytics.similarity.showButton"
+            (click)="selectedSimilarityReferenceCircleChange(context.circle)">
+            <!-- Find similar comments -->
+            See similar comments ({{ context.analytics.similarity.similarCommentsCount }})
+          </ion-button>
+          <ion-button size="small" fill="clear" color="medium"
+            *ngIf="context.analytics.similarity.showScore">
+            Similarity: {{ (context.analytics.similarity.score * 100) | number : '1.2-2' }}%
+          </ion-button>
+        </div>
+      </div>
+      <div class="reply-button-container">
+        <ion-button size="small" fill="clear" color="primary"
+          *ngIf="context.replies.showViewAsReplyToParentButton"
+          (click)="selectConcentricCircle(context.comment.parentCommentId, context.comment.id)">
+          View as reply to {{ context.comment.parentAuthorName }}
+        </ion-button>
+        <ion-button size="small" fill="clear" color="primary"
+          *ngIf="context.replies.showViewRepliesButton"
+          (click)="selectConcentricCircle(context.comment.id, context.comment.id)">
+          View replies
+        </ion-button>
+      </div>
+    </ion-label>
+  </ion-item>
+</ng-template>

@@ -1,0 +1,21 @@
+<ion-content fullscreen>
+  <div class="d-flex justify-content-end p-3">
+    <ion-button fill="clear" color="dark" (click)="displayAddPostAlert()">
+      <ion-icon name="add"></ion-icon>
+    </ion-button>
+  </div>
+  <ion-list>
+    <ion-card *ngFor="let post of posts" [routerLink]="['', 'kandinsky-interface', post.platform, post.id]">
+      <ion-card-content>
+        <ion-item class="pt-3" lines="none">
+          <p class="text-light"><span class="badge badge-danger">{{ post.platform }}</span> {{ post.content }}</p>
+        </ion-item>
+        <ion-item lines="none">
+          <small slot="start" class="text-muted">by {{ post.authorName }}</small>
+          <small slot="end" class="text-muted">added {{ post.metadata.createTimestamp | amTimeAgo }}</small>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+  </ion-list>
+  <h6 *ngIf="!posts || posts.length == 0" class="text-center p-5 text-muted">Click on the '+' icon above to add a new post to visualize.</h6>
+</ion-content>

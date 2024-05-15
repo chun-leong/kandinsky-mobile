@@ -1,0 +1,70 @@
+.interface-overlay {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.interface-header {
+  pointer-events: all;
+  
+  ion-item  {
+    --ion-item-background: transparent;
+  }
+
+  .title-container {
+    font-size: 13px;
+  }
+}
+
+.comments-container {
+    
+  .comments-list {
+    max-height: 14vh;
+    overflow-y: scroll;
+  }
+}
+
+.interface-content {
+
+  & > * {
+    pointer-events: all;
+  }
+
+  .timestamp-container {
+    pointer-events: none;
+  }
+}
+
+.comment-item {
+  
+  .like-bar {
+    display: block;
+    position: absolute;
+    height: calc(100% - 24px);
+    left: 0;
+  }
+  
+  .similarity-container {
+    ion-button {
+      --padding-end: 0;
+    }
+  }
+  
+  ion-button {
+    --padding-start: 0;
+  }
+}
+
+.context-menu-button {
+  --padding-end: 0;
+}
+
+.mini-reference-comment-item {
+  --inner-padding-end: 0;
+}

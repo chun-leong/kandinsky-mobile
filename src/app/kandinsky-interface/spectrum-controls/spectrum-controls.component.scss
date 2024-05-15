@@ -1,0 +1,17 @@
+.spectrum-controls-container {
+    position: relative;
+
+    .range-container {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+
+        ion-range {
+            // --knob-size: 8px;
+            --bar-background: transparent;
+            --bar-height: 0px;
+            --height: 80px;
+        }
+    }
+}
