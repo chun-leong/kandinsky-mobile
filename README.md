@@ -6,11 +6,11 @@
 4. In the file [src\app\config\index.ts](src\app\config\index.ts), replace "<YOUR_YOUTUBE_API_KEY>" with a valid YouTube API key.
 
 # Building:
+Note: In Node.js versions 17 and later, run `set NODE_OPTIONS=--openssl-legacy-provider` first.
 
 ### Local Server
 
-1. In Node.js versions 17 and later, run `set NODE_OPTIONS=--openssl-legacy-provider`.
-2. Serve the application in your local browser by running `ionic serve`.
+1. Serve the application in your local browser by running `ionic serve`.
 
 ### Android
 **Requires Android Studio to be installed**
